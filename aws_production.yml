@@ -1,0 +1,98 @@
+- hosts: localhost
+  vars_files:
+   - vars.yml
+  tasks:
+   - ec2_instance_facts:
+      region: '{{ region }}'
+      filters:
+         tag:Name: Production
+
+      aws_access_key: '{{ aws_access_key }}'
+      aws_secret_key: '{{ aws_secret_key }}'
+     register: ec2_prod
+
+
+   - name: Add new instance to host group
+     add_host:
+       hostname: "{{ item.public_ip_address }}"
+       groupname: product
+     with_items: '{{ec2_prod.instances}}'
+
+   - name: Wait for SSH to come up
+     wait_for: host={{ item.public_dns_name }} port=22 delay=60 timeout=1000 state=started
+     with_items: '{{ec2_prod.instances}}'
+
+- name: Configure instance
+  hosts: product
+  connection: ssh
+  remote_user: ec2-user
+  gather_facts: yes
+  become: True
+  become_user: root
+
+  tasks:
+
+   - name: Install java 8, javac and set JAVA_HOME
+     command: "{{ item }}"
+     with_items:
+       - yum install -y java-1.8.0-openjdk.x86_64
+       - /usr/sbin/alternatives --set java /usr/lib/jvm/jre-1.8.0-openjdk.x86_64/bin/java
+       - yum install -y java-devel
+
+   - name: Install  git
+     yum: name=git state=present
+
+   - name: Install  docker
+     yum: name=docker state=latest
+
+   - name: Install xmlstarlet
+     yum: name=xmlstarlet state=latest
+
+   - name: Enable docker
+     service:
+       name: docker
+       enabled: yes
+
+   - name: Install pip module
+     yum: name=python-pip state=latest
+
+   - name: Install Python docker module
+     pip: name=docker state=present
+
+   - name: Install boto3
+     pip: name=boto3 state=present
+   - name: Start docker service
+     service:
+       name: docker
+       state: started
+
+   - name: Change docker.sock ownership
+     file:
+       path: /var/run/docker.sock
+       mode: '0777'
+
+   - name: Upload Jmeter script to the docker host
+     synchronize: src=/home/ansible_user/playbooks/cinema.jmx dest=/tmp
+
+   - name: Pull image
+     docker_image:
+       name: yuqidockerid/cinema:latest
+
+   - name: Running the container
+     docker_container:
+       name: mycinema
+       image: yuqidockerid/cinema:latest
+       state: started
+       ports: "8030:8030"
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,6 @@
+<html>
+<body>
+<p>${username}, there is a new movie in our offer.</p>
+<p>${movieName}:${movieDescription}</p>
+</body>
+</html>

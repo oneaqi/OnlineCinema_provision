@@ -1,0 +1,22 @@
+<mapping>
+    <class name="ba.pehli.cinema.domain.Movies">
+        <field name="movies" type="ba.pehli.cinema.domain.Movie" collection="arraylist">
+            <bind-xml name="movie"/>
+        </field>
+    </class>
+
+    <class name="ba.pehli.cinema.domain.Movie" identity="id">
+        <map-to xml="movie" />
+
+        <field name="id" type="int">
+            <bind-xml name="id" node="element"/>
+        </field>
+        <field name="name" type="string">
+            <bind-xml name="name" node="element" />
+        </field>
+        <field name="description" type="string">
+            <bind-xml name="desc" node="element" />
+        </field>
+    </class>
+
+</mapping>

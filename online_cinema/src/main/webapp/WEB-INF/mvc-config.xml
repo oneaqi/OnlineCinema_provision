@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <mvc:annotation-driven validator="validator">
+    	<!-- enables converting objects into json/xml and vice versa -->
+    	<mvc:message-converters>
+    		<ref bean="jsonMapper"/>
+    		<bean class="org.springframework.http.converter.xml.MarshallingHttpMessageConverter">
+    			<property name="marshaller" ref="castorMarshaller"/>
+    			<property name="unmarshaller" ref="castorMarshaller"/>
+    		</bean>
+    	</mvc:message-converters>
+    	<!-- enables spring mobile arguments in controllers -->
+    	<mvc:argument-resolvers>
+    		<bean class="org.springframework.mobile.device.DeviceHandlerMethodArgumentResolver" />
+    		<bean class="org.springframework.mobile.device.site.SitePreferenceHandlerMethodArgumentResolver" />
+    	</mvc:argument-resolvers>
+    </mvc:annotation-driven>
+    
+    <security:global-method-security pre-post-annotations="enabled"/>
+    
+    <mvc:resources location="/styles,/scripts,/images" mapping="/resources/**" />
+    
+    <bean id="mobileViewResolver" class="org.springframework.mobile.device.view.LiteDeviceDelegatingViewResolver">
+    	<constructor-arg name="delegate" ref="tilesViewResolver" />
+    	<property name="order" value="1" />
+    	<property name="mobileSuffix" value="_mobile" />
+    </bean>
+
+	<bean id="tilesViewResolver" class="org.springframework.web.servlet.view.UrlBasedViewResolver">
+		<property name="viewClass" value="org.springframework.web.servlet.view.tiles3.TilesView" />
+		<property name="order" value="2" />
+	</bean> 
+	
+	<bean id="tilesConfigurer" class="org.springframework.web.servlet.view.tiles3.TilesConfigurer">
+		<property name="definitions">
+			<list>
+				<value>/WEB-INF/layouts/layouts.xml</value>
+				<value>/WEB-INF/view/**/views.xml</value>
+			</list>
+		</property>
+	</bean>
+	
+	<context:component-scan base-package="ba.pehli.cinema.controller ba.pehli.cinema.facebook"/>
+	
+	<mvc:interceptors>
+		<bean class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
+			<property name="paramName" value="lang" />
+		</bean>
+		<bean class="org.springframework.mobile.device.DeviceResolverHandlerInterceptor" />
+		<bean class="org.springframework.mobile.device.site.SitePreferenceHandlerInterceptor" />
+	</mvc:interceptors>
+
+	<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<property name="basename" value="WEB-INF/i18n/application" />
+	</bean>
+
+	<bean id="localeResolver" class="org.springframework.web.servlet.i18n.CookieLocaleResolver">
+		<property name="defaultLocale" value="en"/>
+	</bean>
+	
+	<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+		<property name="validationMessageSource" ref="messageSource" />
+	</bean>
+
+	<context:property-placeholder location="classpath:email/email.properties"/>
+	
+	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="${email.host}" />
+		<property name="port" value="${email.port}" />
+		<property name="username" value="${email.username}" />
+		<property name="password" value="${email.password}" />
+		<property name="javaMailProperties">
+			<props>
+				<prop key="mail.smtp.auth">${email.auth}</prop>
+				<prop key="mail.smtp.starttls.enable">${email.starttls}</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<bean id="velocityEngine" class="org.springframework.ui.velocity.VelocityEngineFactoryBean">
+		<property name="velocityProperties">
+			<props>
+				<prop key="resource.loader">class</prop>
+				<prop key="class.resource.loader.class">org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader</prop>
+			</props>
+		</property>	
+	</bean>
+	
+	<bean id="emailUtils" class="ba.pehli.cinema.utils.EmailUtils">
+		<property name="mailSender" ref="mailSender" />
+		<property name="velocityEngine" ref="velocityEngine" />
+	</bean>
+	<!-- 
+	<bean id="multipartResolver" class="org.springframework.web.multipart.support.StandardServletMultipartResolver" />
+	 -->
+
+	 <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver" />
+
+	<bean id="castorMarshaller" class="org.springframework.oxm.castor.CastorMarshaller">
+		<property name="mappingLocation" value="classpath:ws/oxm-mapping.xml" />
+	</bean>
+	
+	<!-- Open Movie Database is Restful-WS which sends data in JSON format -->
+	<bean id="restTemplate" class="org.springframework.web.client.RestTemplate">
+		<property name="messageConverters">
+			<list>
+				<ref bean="jsonMapper"/>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="jsonMapper" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter" />
+</beans>

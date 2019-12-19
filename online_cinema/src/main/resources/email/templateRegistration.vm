@@ -1,0 +1,7 @@
+<html>
+<body>
+<h4>${username}, welcome. Please verify your address by clicking 
+<a href="http://localhost:8080/cinema/users/verification/${verificationCode}">here</a>
+</h4>
+</body>
+</html>

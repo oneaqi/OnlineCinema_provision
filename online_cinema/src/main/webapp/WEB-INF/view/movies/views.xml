@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC
+       "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+       "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+<tiles-definitions>
+	<definition extends="default" name="movies/list">
+		<put-attribute name="body" value="/WEB-INF/view/movies/list.jsp" />
+	</definition>
+	<definition extends="default" name="movies/edit">
+		<put-attribute name="body" value="/WEB-INF/view/movies/edit.jsp" />
+	</definition>
+	<definition extends="mobile" name="movies/list_mobile">
+		<put-attribute name="body" value="/WEB-INF/view/movies/mobile/list.jsp" />
+	</definition>
+	<definition extends="mobile" name="movies/edit_mobile">
+		<put-attribute name="body" value="/WEB-INF/view/movies/mobile/edit.jsp" />
+	</definition>
+</tiles-definitions>

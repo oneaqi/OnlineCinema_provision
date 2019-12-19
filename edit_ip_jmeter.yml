@@ -1,0 +1,17 @@
+- hosts: localhost
+  vars_files:
+   - vars.yml
+  tasks:
+   - ec2_instance_facts:
+      region: '{{ region }}'
+      filters:
+         tag:Name: Test_ec2
+
+      aws_access_key: '{{ aws_access_key }}'
+      aws_secret_key: '{{ aws_secret_key }}'
+     register: ec2_metadata
+
+   - name: Set ip address in Jmeter script
+     shell: xmlstarlet edit -L -u "/jmeterTestPlan/hashTree/hashTree/hashTree/HTTPSamplerProxy/stringProp[1]" -v "{{ item.public_ip_address }}" cinema.jmx 
+     with_items: "{{ ec2_metadata.instances }}"
+
