@@ -18,7 +18,7 @@ pipeline {
     stage('Building image'){
       steps{
         script{
-          dockerImage = docker.build yuqidockerid/cinema
+          dockerImage = docker.build "yuqidockerid/cinema"
         }
 }
 }
