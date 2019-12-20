@@ -17,13 +17,17 @@ pipeline {
     
     stage('Building image'){
       steps{
-        dockerImage = docker.build yuqidockerid/cinema
+        script{
+          dockerImage = docker.build yuqidockerid/cinema
+        }
 }
 }
 
     stage('Deploy image'){
       steps{
+        script{
         docker.withRegistry('',registryCredential){dockerImage.push()}
+        }
 }
 }
 
