@@ -3,7 +3,7 @@ pipeline {
     environment {
         gpg_passphrase = credentials("gpg-passphrase")
         dockerImage = '';
-        registryCredential = credentials("dockerCredential")
+        registryCredential = "dockerCredential"
     }
 
    stages {
