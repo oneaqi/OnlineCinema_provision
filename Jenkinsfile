@@ -9,7 +9,7 @@ pipeline {
    stages {
     stage('SCM'){
             steps {
-                git credentialsId: 'a55fbd81-8017-4f19-97d8-71947b4caf8e', url: 'https://github.com/oneaqi/Provision.git'
+                git credentialsId: 'a55fbd81-8017-4f19-97d8-71947b4caf8e', url: 'https://github.com/oneaqi/OnlineCinema_provision.git'
                 sh "git secret reveal -p '$gpg_passphrase' "
                 
             }
