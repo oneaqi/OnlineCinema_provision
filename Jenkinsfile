@@ -49,11 +49,11 @@ pipeline {
        }
     }
     
-   // stage('Terminating'){
-       // steps{
-        //    sh "ansible-playbook --private-key=/admin-key-pair.pem aws_terminate.yml"        
-       // }
-   // }    
+    stage('Terminating'){
+        steps{
+            sh "ansible-playbook --private-key=/admin-key-pair.pem aws_terminate.yml"        
+        }
+    }    
 
     stage('Production'){
         steps{

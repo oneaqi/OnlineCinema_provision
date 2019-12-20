@@ -71,9 +71,9 @@
        path: /var/run/docker.sock
        mode: '0777'
 
-   - name: Upload Jmeter script to the docker host
-     synchronize: src=/home/ansible_user/playbooks/cinema.jmx dest=/tmp
-
+   - name: Remove old docker image
+     command: docker rmi -f  yuqidockerid/cinema:latest
+ 
    - name: Pull image
      docker_image:
        name: yuqidockerid/cinema:latest
